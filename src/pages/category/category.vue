@@ -66,38 +66,9 @@ export default {
 			// let index = this.slist.findIndex((sitem) => sitem.pid === item.id);
 			// this.tabScrollTop = this.slist[index].top;
 		},
-		//右侧栏滚动
-		asideScroll(e) {
-			if (!this.sizeCalcState) {
-				this.calcSize();
-			}
-			let scrollTop = e.detail.scrollTop;
-			let tabs = this.slist.filter((item) => item.top <= scrollTop).reverse();
-			if (tabs.length > 0) {
-				this.currentId = tabs[0].pid;
-			}
-		},
-		//计算右侧栏每个tab的高度等信息
-		calcSize() {
-			let h = 0;
-			this.slist.forEach((item) => {
-				let view = uni.createSelectorQuery().select('#main-' + item.id);
-				view.fields(
-					{
-						size: true,
-					},
-					(data) => {
-						item.top = h;
-						h += data.height;
-						item.bottom = h;
-					},
-				).exec();
-			});
-			this.sizeCalcState = true;
-		},
 		navToList(sid, tid) {
 			uni.navigateTo({
-				url: `/pages/product/list?fid=${this.currentId}&sid=${sid}&tid=${tid}`,
+				url: `/pages/product/list?fid=${this.currentId}&sid=${sid}`,
 			});
 		},
 	},
