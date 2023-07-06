@@ -103,19 +103,10 @@ export default {
 	},
 	methods: {
 		//加载分类
-		async loadCateList(fid, sid) {
+		async loadCateList() {
 			const {
 				data: { elements: categoryList },
 			} = await getCategoryList();
-			// let {
-			// 	data: { element: list },
-			// } = await getProductList({ productCategoryId: sid });
-			// let cateList = list.filter((item) => item.pid == fid);
-			//
-			// cateList.forEach((item) => {
-			// 	let tempList = list.filter((val) => val.pid == item.id);
-			// 	item.child = tempList;
-			// });
 			this.cateList = categoryList;
 		},
 		//加载商品 ，带下拉刷新和上滑加载
@@ -130,23 +121,34 @@ export default {
 				this.loadingType = 'more';
 			}
 
-			let {
-				data: { elements: goodsList },
-			} = await getProductList({ productCategoryId: this.cateId });
+			let goodsList = [];
 			if (type === 'refresh') {
 				this.goodsList = [];
 			}
 			//筛选，测试数据直接前端筛选了
 			if (this.filterIndex === 1) {
-				goodsList.sort((a, b) => b.sales - a.sales);
-			}
-			if (this.filterIndex === 2) {
-				goodsList.sort((a, b) => {
-					if (this.priceOrder == 1) {
-						return a.price - b.price;
-					}
-					return b.price - a.price;
-				});
+				// goodsList.sort((a, b) => b.sales - a.sales);
+				let res = await getProductList({ productCategoryId: this.cateId, sortBy: 'sales', sortOrder: 'DESC' });
+				goodsList = res.data.elements;
+			} else if (this.filterIndex === 2) {
+				if (this.priceOrder == 1) {
+					let res = await getProductList({
+						productCategoryId: this.cateId,
+						sortBy: 'salePrice',
+						sortOrder: 'ASC',
+					});
+					goodsList = res.data.elements;
+				} else {
+					let res = await getProductList({
+						productCategoryId: this.cateId,
+						sortBy: 'salePrice',
+						sortOrder: 'DESC',
+					});
+					goodsList = res.data.elements;
+				}
+			} else {
+				let res = await getProductList({ productCategoryId: this.cateId });
+				goodsList = res.data.elements;
 			}
 
 			this.goodsList = this.goodsList.concat(goodsList);
