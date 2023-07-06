@@ -20,7 +20,7 @@
 				<view class="image-wrapper">
 					<image :src="item.coverUrls[0]" mode="aspectFill"></image>
 				</view>
-				<text class="title clamp">{{ item.title }}</text>
+				<text class="title clamp">{{ item.name }}</text>
 				<view class="price-box">
 					<text class="price">{{ item.salePrice / 100 }}</text>
 					<text>已售 {{ item.sales || 0 }}</text>
