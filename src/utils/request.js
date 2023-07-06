@@ -4,7 +4,7 @@ const http = new Request();
 
 http.setConfig((config) => {
 	/* 设置全局配置 */
-	config.baseURL = 'http://localhost:3000';
+	// config.baseURL = 'http://localhost:3002';
 	config.header = {
 		...config.header,
 	};
@@ -62,15 +62,16 @@ http.interceptors.response.use(
 		}
 		return response.data;
 	},
-	(response) => {
+	(error) => {
 		// 请求错误做点什么。可以使用async await 做异步操作
 		// 提示错误信息
-		console.log('response error', response);
+		console.log('response error', error);
 		uni.showToast({
-			title: response.errMsg,
+			title: error.data.error?.message,
 			duration: 1500,
+			icon: 'error',
 		});
-		return Promise.reject(response);
+		return Promise.reject(error);
 	},
 );
 

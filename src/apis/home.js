@@ -6,3 +6,10 @@ export async function getContentList() {
 		url: '/home/content',
 	});
 }
+
+export async function getCategoryList() {
+	return request({
+		method: 'GET',
+		url: '/api/v1/product-category',
+	});
+}

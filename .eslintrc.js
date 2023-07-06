@@ -1,6 +1,7 @@
 module.exports = {
 	env: {
 		browser: true,
+		node: true,
 	},
 	ignorePatterns: ['.eslintrc.js'],
 	extends: ['eslint:recommended', 'plugin:vue/vue3-essential', 'plugin:prettier/recommended'],

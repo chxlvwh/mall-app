@@ -60,5 +60,17 @@
         "setting" : {
             "urlCheck" : true
         }
+    },
+    "h5": {
+        "devServer": {
+            "proxy": {
+                "/api/": {
+                    "target": "http://localhost:3002",
+                    "pathRewrite": {
+                        "^/prefix": "/api/"
+                    }
+                }
+            }
+        }
     }
 }
