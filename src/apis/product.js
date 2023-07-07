@@ -7,3 +7,10 @@ export async function getProductList(params) {
 		params,
 	});
 }
+
+export async function getProductById(id) {
+	return request({
+		method: 'GET',
+		url: `/api/v1/product/${id}`,
+	});
+}

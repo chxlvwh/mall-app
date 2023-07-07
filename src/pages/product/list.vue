@@ -208,7 +208,7 @@ export default {
 		//详情
 		navToDetailPage(item) {
 			//测试数据没有写id，用title代替
-			let id = item.title;
+			let id = item.id;
 			uni.navigateTo({
 				url: `/pages/product/product?id=${id}`,
 			});
@@ -360,7 +360,7 @@ page,
 .goods-list {
 	display: flex;
 	flex-wrap: wrap;
-	padding: 0 30upx;
+	padding: 30upx;
 	background: #fff;
 	.goods-item {
 		display: flex;
