@@ -137,8 +137,8 @@
 						src="https://gd3.alicdn.com/imgextra/i3/0/O1CN01IiyFQI1UGShoFKt1O_!!0-item_pic.jpg_400x400.jpg"
 					></image>
 					<view class="right">
-						<text class="price">¥328.00</text>
-						<text class="stock">库存：188件</text>
+						<text class="price">¥{{ (getSelectedSku().price / 100).toFixed(2) }}</text>
+						<text class="stock">库存：{{ getSelectedSku().stock }}{{ detail.unit }}</text>
 						<view class="selected">
 							已选：
 							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
@@ -266,6 +266,17 @@ export default {
 					this.specSelected.push(selected);
 				}
 			});
+		},
+		//获取选中的sku
+		getSelectedSku() {
+			const selectedSku = this.detail.skus.find((sku) => {
+				return sku.props.every((prop) => {
+					return this.specSelected.some((selected) => {
+						return selected.value === prop.value;
+					});
+				});
+			});
+			return selectedSku;
 		},
 		//分享
 		share() {
