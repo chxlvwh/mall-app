@@ -14,7 +14,7 @@ http.setConfig((config) => {
 http.interceptors.request.use((config) => {
 	/* 请求之前拦截器。可以使用async await 做异步操作 */
 	const token = uni.getStorageSync('token');
-	if (!token) {
+	if (token) {
 		// 如果token不存在，return Promise.reject(config) 会取消本次请求
 		config.header = {
 			Authorization: `Bearer ${token}`,
@@ -37,28 +37,24 @@ http.interceptors.response.use(
 	(response) => {
 		/* 请求之后拦截器。可以使用async await 做异步操作  */
 		const res = response.data;
-		if (res.code !== 200) {
-			// 服务端返回的状态码不等于200，则reject()
-			uni.showToast({ title: res.message, duration: 1500 });
-			// 401未登录处理
-			if (res.code === 401) {
-				uni.showModal({
-					title: '提示',
-					content: '你已被登出，可以取消继续留在该页面，或者重新登录',
-					confirmText: '重新登录',
-					cancelText: '取消',
-					success(res) {
-						if (res.confirm) {
-							uni.navigateTo({
-								url: '/pages/public/login',
-							});
-						} else if (res.cancel) {
-							console.log('用户点击取消');
-						}
-					},
-				});
-			}
-			return Promise.reject(response);
+		console.log('[response:] ', response);
+		// 401未登录处理
+		if (res.code === 401) {
+			uni.showModal({
+				title: '提示',
+				content: '你已被登出，可以取消继续留在该页面，或者重新登录',
+				confirmText: '重新登录',
+				cancelText: '取消',
+				success(res) {
+					if (res.confirm) {
+						uni.navigateTo({
+							url: '/pages/public/login',
+						});
+					} else if (res.cancel) {
+						console.log('用户点击取消');
+					}
+				},
+			});
 		}
 		return response.data;
 	},
