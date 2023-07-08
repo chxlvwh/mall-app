@@ -80,6 +80,7 @@ export default {
 					this.logining = false;
 					uni.setStorageSync('token', res.access_token);
 					getUserInfo().then((response) => {
+						console.log('[response:] ', response.data);
 						this.login(response.data);
 						uni.navigateBack();
 					});

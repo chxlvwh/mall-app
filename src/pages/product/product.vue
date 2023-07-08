@@ -123,7 +123,7 @@
 
 			<view class="action-btn-group">
 				<button type="primary" class="action-btn no-border buy-now-btn" @click="buy">立即购买</button>
-				<button type="primary" class="action-btn no-border add-cart-btn">加入购物车</button>
+				<button type="primary" class="action-btn no-border add-cart-btn" @click="addToCart">加入购物车</button>
 			</view>
 		</view>
 
@@ -136,9 +136,19 @@
 					<image
 						src="https://gd3.alicdn.com/imgextra/i3/0/O1CN01IiyFQI1UGShoFKt1O_!!0-item_pic.jpg_400x400.jpg"
 					></image>
-					<view class="right">
+					<view class="right" v-if="getSelectedSku()">
 						<text class="price">¥{{ (getSelectedSku().price / 100).toFixed(2) }}</text>
 						<text class="stock">库存：{{ getSelectedSku().stock }}{{ detail.unit }}</text>
+						<view class="selected">
+							已选：
+							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
+								{{ sItem.value }}
+							</text>
+						</view>
+					</view>
+					<view class="right" v-else>
+						<text class="price">¥{{ (detail.salePrice / 100).toFixed(2) }}</text>
+						<text class="stock">库存：{{ detail.stock }}{{ detail.unit }}</text>
 						<view class="selected">
 							已选：
 							<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
@@ -172,6 +182,8 @@
 <script>
 import share from '@/components/share';
 import { getProductById } from '@/apis/product';
+import { mapState } from 'vuex';
+
 export default {
 	components: {
 		share,
@@ -195,6 +207,9 @@ export default {
 			 */
 			specList: [],
 		};
+	},
+	computed: {
+		...mapState(['hasLogin']),
 	},
 	async onLoad(options) {
 		//接收传值,id里面放的是标题，因为测试数据并没写id
@@ -269,14 +284,14 @@ export default {
 		},
 		//获取选中的sku
 		getSelectedSku() {
-			const selectedSku = this.detail.skus.find((sku) => {
+			if (!this.detail.skus) return;
+			return this.detail.skus.find((sku) => {
 				return sku.props.every((prop) => {
 					return this.specSelected.some((selected) => {
 						return selected.value === prop.value;
 					});
 				});
 			});
-			return selectedSku;
 		},
 		//分享
 		share() {
@@ -292,6 +307,35 @@ export default {
 			});
 		},
 		stopPrevent() {},
+		addToCart() {
+			if (!this.checkForLogin()) {
+				return;
+			}
+			uni.showToast({
+				title: '模拟加入购物车成功',
+				icon: 'none',
+			});
+		},
+		checkForLogin() {
+			if (!this.hasLogin) {
+				uni.showModal({
+					title: '提示',
+					content: '您还未登录，是否前往登录？',
+					confirmText: '前往登录',
+					cancelText: '暂不登录',
+					success: (res) => {
+						if (res.confirm) {
+							uni.navigateTo({
+								url: '/pages/login/login',
+							});
+						}
+					},
+				});
+				return false;
+			} else {
+				return true;
+			}
+		},
 	},
 };
 </script>
