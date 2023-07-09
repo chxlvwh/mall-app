@@ -37,3 +37,10 @@ export async function UpdateReceiver(userId, receiverId, data) {
 		data,
 	});
 }
+
+export async function deleteReceiver(userId, receiverId) {
+	return request({
+		method: 'DELETE',
+		url: `/api/v1/public/user/${userId}/receivers/${receiverId}`,
+	});
+}

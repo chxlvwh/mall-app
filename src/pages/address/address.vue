@@ -21,7 +21,7 @@
 
 <script>
 import { mapState } from 'vuex';
-import { getReceivers } from '@/apis/user';
+import { deleteReceiver, getReceivers } from '@/apis/user';
 
 export default {
 	data() {
@@ -76,6 +76,24 @@ export default {
 		async refreshList() {
 			//添加或修改后事件，这里直接在最前面添加了一条数据，实际应用中直接刷新地址列表即可
 			await this.loadData();
+		},
+		//删除地址
+		async handleDeleteAddress(id) {
+			uni.showModal({
+				title: '提示',
+				content: '确定删除该地址吗？',
+				success: async (res) => {
+					if (res.confirm) {
+						//删除地址
+						await deleteReceiver(this.userInfo.id, id);
+						uni.showToast({
+							title: '删除成功',
+							icon: 'success',
+						});
+						await this.loadData();
+					}
+				},
+			});
 		},
 	},
 };
