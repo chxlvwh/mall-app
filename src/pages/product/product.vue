@@ -302,6 +302,9 @@ export default {
 			this.favorite = !this.favorite;
 		},
 		buy() {
+			if (!this.checkForLogin()) {
+				return;
+			}
 			uni.navigateTo({
 				url: `/pages/order/createOrder`,
 			});
@@ -326,7 +329,7 @@ export default {
 					success: (res) => {
 						if (res.confirm) {
 							uni.navigateTo({
-								url: '/pages/login/login',
+								url: '/pages/public/login',
 							});
 						}
 					},

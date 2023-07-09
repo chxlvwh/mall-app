@@ -1,5 +1,5 @@
 {
-    "name" : "电商模板 更新下单流程、分类、列表",
+    "name" : "电商模板",
     "appid" : "",
     "description" : "",
     "versionName" : "1.0.0",
@@ -7,7 +7,7 @@
     "transformPx" : false,
     "app-plus" : {
         /* 5+App特有相关 */
-		"usingComponents":true,
+        "usingComponents" : true,
         "splashscreen" : {
             "alwaysShowBeforeRender" : true,
             "waiting" : true,
@@ -55,20 +55,32 @@
     /* 快应用特有相关 */
     "mp-weixin" : {
         /* 小程序特有相关 */
-		"usingComponents":true,
+        "usingComponents" : true,
         "appid" : "",
         "setting" : {
             "urlCheck" : true
+        },
+        "permission" : {
+            "scope.userLocation" : {
+                "desc" : ""
+            }
         }
     },
-    "h5": {
-        "devServer": {
-            "proxy": {
-                "/api/": {
-                    "target": "http://localhost:3002",
-                    "pathRewrite": {
-                        "^/prefix": "/api/"
+    "h5" : {
+        "devServer" : {
+            "proxy" : {
+                "/api/" : {
+                    "target" : "http://localhost:3002",
+                    "pathRewrite" : {
+                        "^/prefix" : "/api/"
                     }
+                }
+            }
+        },
+        "sdkConfigs" : {
+            "maps" : {
+                "qqmap" : {
+                    "key" : "6MRBZ-JDN3Z-C67XU-ZZMAX-KESQE-BDBT3"
                 }
             }
         }
