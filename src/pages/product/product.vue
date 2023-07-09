@@ -222,10 +222,14 @@ export default {
 				this.imgList = detail.coverUrls;
 				this.desc = detail.desc;
 				if (detail.skus) {
-					this.specList = detail.skus[0]?.props.map((it) => ({
-						id: it.name,
-						name: it.displayName || it.name,
-					}));
+					this.specList =
+						detail.skus[0]?.props.map((it) => ({
+							id: it.name,
+							name: it.displayName || it.name,
+						})) || [];
+					if (!this.specList.length) {
+						return;
+					}
 					this.specList.forEach((prop) => {
 						detail.skus.forEach((sku) => {
 							if (!prop.values) {
@@ -244,8 +248,10 @@ export default {
 		}
 
 		//规格 默认选中第一条
-		this.selectSpec(0, this.specList[0].values);
-		this.selectSpec(0, this.specList[1].values);
+		if (this.specList.length) {
+			this.selectSpec(0, this.specList[0].values);
+			this.selectSpec(0, this.specList[1].values);
+		}
 
 		this.shareList = await this.$api.json('shareList');
 	},
