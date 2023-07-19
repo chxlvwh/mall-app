@@ -44,3 +44,27 @@ export async function deleteReceiver(userId, receiverId) {
 		url: `/api/v1/public/user/${userId}/receivers/${receiverId}`,
 	});
 }
+
+// 获取优惠券列表
+export async function getCoupons() {
+	return request({
+		method: 'GET',
+		url: `/api/v1/coupon`,
+	});
+}
+
+// 获取有效优惠券列表
+export async function getValidCoupons(productId) {
+	return request({
+		method: 'GET',
+		url: `/api/v1/coupon/product/${productId}/valid`,
+	});
+}
+
+// 领取优惠券
+export async function receiveCoupon(couponId) {
+	return request({
+		method: 'POST',
+		url: `/api/v1/coupon/${couponId}/receive`,
+	});
+}

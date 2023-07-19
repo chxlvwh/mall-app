@@ -38,35 +38,40 @@ http.interceptors.response.use(
 		/* 请求之后拦截器。可以使用async await 做异步操作  */
 		const res = response.data;
 		console.log('[response:] ', response);
-		// 401未登录处理
-		if (res.code === 401) {
-			uni.showModal({
-				title: '提示',
-				content: '你已被登出，可以取消继续留在该页面，或者重新登录',
-				confirmText: '重新登录',
-				cancelText: '取消',
-				success(res) {
-					if (res.confirm) {
-						uni.navigateTo({
-							url: '/pages/public/login',
-						});
-					} else if (res.cancel) {
-						console.log('用户点击取消');
-					}
-				},
-			});
-		}
 		return response.data;
 	},
 	(error) => {
 		// 请求错误做点什么。可以使用async await 做异步操作
 		// 提示错误信息
 		console.log('response error', error);
-		uni.showToast({
-			title: error.data.error?.message,
-			duration: 1500,
-			icon: 'error',
-		});
+
+		// 401未登录处理
+		if (error.statusCode === 401) {
+			uni.redirectTo({
+				url: '/pages/public/login',
+			});
+			// uni.showModal({
+			// 	title: '提示',
+			// 	content: '你已被登出，可以取消继续留在该页面，或者重新登录',
+			// 	confirmText: '重新登录',
+			// 	cancelText: '取消',
+			// 	success(res) {
+			// 		if (res.confirm) {
+			// 			uni.navigateTo({
+			// 				url: '/pages/public/login',
+			// 			});
+			// 		} else if (res.cancel) {
+			// 			console.log('用户点击取消');
+			// 		}
+			// 	},
+			// });
+		} else {
+			uni.showToast({
+				title: error.data.error?.message,
+				duration: 1500,
+				icon: 'error',
+			});
+		}
 		return Promise.reject(error);
 	},
 );

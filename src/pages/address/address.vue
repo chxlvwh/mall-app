@@ -15,6 +15,8 @@
 			<text class="yticon icon-iconfontshanchu1" @click.stop="handleDeleteAddress(item.id)"></text>
 		</view>
 
+		<view v-if="!addressList.length" class="text-center">请添加收货地址</view>
+
 		<button class="add-btn" @click="addAddress('add')">新增地址</button>
 	</view>
 </template>
@@ -27,27 +29,11 @@ export default {
 	data() {
 		return {
 			source: 0,
-			addressList: [
-				{
-					name: '刘晓晓',
-					mobile: '18666666666',
-					addressName: '贵族皇仕牛排(东城店)',
-					address: '北京市东城区',
-					area: 'B区',
-					default: true,
-				},
-				{
-					name: '刘大大',
-					mobile: '18667766666',
-					addressName: '龙回1区12号楼',
-					address: '山东省济南市历城区',
-					area: '西单元302',
-					default: false,
-				},
-			],
+			addressList: [],
 		};
 	},
 	onLoad(option) {
+		this.source = option.source;
 		console.log('[option:] ', option);
 		this.refreshList();
 	},
@@ -99,7 +85,12 @@ export default {
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
+.text-center {
+	padding: 20upx 0;
+	text-align: center;
+	color: #c0c4cc;
+}
 page {
 	padding-bottom: 120upx;
 }

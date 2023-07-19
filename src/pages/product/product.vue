@@ -49,7 +49,7 @@
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
-			<view class="c-row b-b">
+			<view class="c-row b-b" @click="toggleCoupon('show')">
 				<text class="tit">优惠券</text>
 				<text class="con t-r red">领取优惠券</text>
 				<text class="yticon icon-you"></text>
@@ -174,6 +174,31 @@
 				<button class="btn" @click="toggleSpec">完成</button>
 			</view>
 		</view>
+
+		<!-- 优惠券面板 -->
+		<view class="mask" :class="couponState === 0 ? 'none' : couponState === 1 ? 'show' : ''" @click="toggleCoupon">
+			<view class="mask-content" @click.stop.prevent="stopPrevent">
+				<!-- 优惠券页面，仿mt -->
+				<view class="coupon-item" v-for="(item, index) in couponList" :key="index" @click="receiveCoupon(item)">
+					<view class="con">
+						<view class="left">
+							<text class="title">{{ item.name }}</text>
+							<text class="time"
+								>有效期至{{ format(new Date(item.endDate), 'yyyy-MM-dd HH:mm:ss') }}</text
+							>
+						</view>
+						<view class="right">
+							<text class="price">{{ item.value }}</text>
+							<text>满{{ item.threshold }}可用</text>
+						</view>
+
+						<view class="circle l"></view>
+						<view class="circle r"></view>
+					</view>
+					<text class="tips">{{ item.scope | scope }}</text>
+				</view>
+			</view>
+		</view>
 		<!-- 分享 -->
 		<share ref="share" :contentHeight="580" :shareList="shareList"></share>
 	</view>
@@ -183,6 +208,8 @@
 import share from '@/components/share';
 import { getProductById } from '@/apis/product';
 import { mapState } from 'vuex';
+import { getValidCoupons, receiveCoupon } from '@/apis/user';
+import { format } from 'date-fns';
 
 export default {
 	components: {
@@ -206,10 +233,26 @@ export default {
 			 * }]
 			 */
 			specList: [],
+			couponList: [],
+			couponState: 0,
 		};
 	},
 	computed: {
 		...mapState(['hasLogin']),
+	},
+	filters: {
+		scope(scope) {
+			switch (scope) {
+				case 'ALL':
+					return '全场通用';
+				case 'CATEGORY':
+					return '指定分类商品可用';
+				case 'PRODUCT':
+					return '指定商品可用';
+				default:
+					return '';
+			}
+		},
 	},
 	async onLoad(options) {
 		//接收传值,id里面放的是标题，因为测试数据并没写id
@@ -221,6 +264,7 @@ export default {
 			if (detail) {
 				this.imgList = detail.coverUrls;
 				this.desc = detail.desc;
+				// 设置商品规格
 				if (detail.skus) {
 					this.specList =
 						detail.skus[0]?.props.map((it) => ({
@@ -256,6 +300,7 @@ export default {
 		this.shareList = await this.$api.json('shareList');
 	},
 	methods: {
+		format,
 		//规格弹窗开关
 		toggleSpec() {
 			if (this.specClass === 'show') {
@@ -266,6 +311,32 @@ export default {
 			} else if (this.specClass === 'none') {
 				this.specClass = 'show';
 			}
+		},
+		//优惠券弹窗开关
+		async toggleCoupon(type) {
+			const { data: coupons } = await getValidCoupons(this.detail.id);
+			this.couponList = coupons;
+			if (!this.couponList || !this.couponList.length) {
+				await uni.showToast({
+					title: '暂无可领优惠券',
+					icon: 'none',
+				});
+				return;
+			}
+			let timer = type === 'show' ? 10 : 300;
+			let state = type === 'show' ? 1 : 0;
+			this.couponState = 2;
+			setTimeout(() => {
+				this.couponState = state;
+			}, timer);
+		},
+		// 领取优惠券
+		async receiveCoupon(coupon) {
+			await receiveCoupon(coupon.id);
+			await uni.showToast({
+				title: '领取成功',
+				icon: 'none',
+			});
 		},
 		//选择规格
 		selectSpec(index, list) {
@@ -377,6 +448,118 @@ page {
 		image {
 			width: 100%;
 			height: 100%;
+		}
+	}
+}
+
+/* 优惠券面板 */
+.mask {
+	display: flex;
+	align-items: flex-end;
+	position: fixed;
+	left: 0;
+	top: var(--window-top);
+	bottom: 0;
+	width: 100%;
+	background: rgba(0, 0, 0, 0);
+	z-index: 100;
+	transition: 0.3s;
+
+	.mask-content {
+		width: 100%;
+		min-height: 30vh;
+		max-height: 70vh;
+		background: #f3f3f3;
+		transform: translateY(100%);
+		transition: 0.3s;
+		overflow-y: scroll;
+	}
+	&.none {
+		display: none;
+	}
+	&.show {
+		background: rgba(0, 0, 0, 0.4);
+
+		.mask-content {
+			transform: translateY(0);
+		}
+	}
+}
+/* 优惠券列表 */
+.coupon-item {
+	display: flex;
+	flex-direction: column;
+	margin: 20upx 24upx;
+	background: #fff;
+	.con {
+		display: flex;
+		align-items: center;
+		position: relative;
+		height: 120upx;
+		padding: 0 30upx;
+		&:after {
+			position: absolute;
+			left: 0;
+			bottom: 0;
+			content: '';
+			width: 100%;
+			height: 0;
+			border-bottom: 1px dashed #f3f3f3;
+			transform: scaleY(50%);
+		}
+	}
+	.left {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		flex: 1;
+		overflow: hidden;
+		height: 100upx;
+	}
+	.title {
+		font-size: 32upx;
+		color: $font-color-dark;
+		margin-bottom: 10upx;
+	}
+	.time {
+		font-size: 24upx;
+		color: $font-color-light;
+	}
+	.right {
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		font-size: 26upx;
+		color: $font-color-base;
+		height: 100upx;
+	}
+	.price {
+		font-size: 44upx;
+		color: $base-color;
+		&:before {
+			content: '￥';
+			font-size: 34upx;
+		}
+	}
+	.tips {
+		font-size: 24upx;
+		color: $font-color-light;
+		line-height: 60upx;
+		padding-left: 30upx;
+	}
+	.circle {
+		position: absolute;
+		left: -6upx;
+		bottom: -10upx;
+		z-index: 10;
+		width: 20upx;
+		height: 20upx;
+		background: #f3f3f3;
+		border-radius: 100px;
+		&.r {
+			left: auto;
+			right: -6upx;
 		}
 	}
 }
