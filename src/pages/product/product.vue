@@ -312,7 +312,7 @@ export default {
 				return;
 			}
 			uni.navigateTo({
-				url: `/pages/order/createOrder`,
+				url: `/pages/order/createOrder?ids=[${this.detail.id}]`,
 			});
 		},
 		stopPrevent() {},

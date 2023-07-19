@@ -18,7 +18,7 @@
 		<view class="goods-list">
 			<view v-for="(item, index) in goodsList" :key="index" class="goods-item" @click="navToDetailPage(item)">
 				<view class="image-wrapper">
-					<image :src="item.coverUrls[0]" mode="aspectFill"></image>
+					<image :src="item.coverUrls && item.coverUrls[0]" mode="aspectFill"></image>
 				</view>
 				<text class="title clamp">{{ item.name }}</text>
 				<view class="price-box">
@@ -77,7 +77,6 @@ export default {
 	},
 
 	onLoad(options) {
-		console.log('[list.vue:] ', options);
 		// #ifdef H5
 		this.headerTop = document.getElementsByTagName('uni-page-head')[0].offsetHeight + 'px';
 		// #endif
@@ -126,35 +125,48 @@ export default {
 				this.goodsList = [];
 			}
 			//筛选，测试数据直接前端筛选了
+			/**
+			 * 0 综合
+			 * 1 销量
+			 * 2 价格
+			 */
+			let res;
 			if (this.filterIndex === 1) {
 				// goodsList.sort((a, b) => b.sales - a.sales);
-				let res = await getProductList({ productCategoryId: this.cateId, sortBy: 'sales', sortOrder: 'DESC' });
+				res = await getProductList({
+					productCategoryId: this.cateId,
+					sortBy: 'sales',
+					sortOrder: 'DESC',
+					status: 1,
+				});
 				goodsList = res.data.elements;
 			} else if (this.filterIndex === 2) {
 				if (this.priceOrder == 1) {
-					let res = await getProductList({
+					res = await getProductList({
 						productCategoryId: this.cateId,
 						sortBy: 'salePrice',
 						sortOrder: 'ASC',
+						status: 1,
 					});
 					goodsList = res.data.elements;
 				} else {
-					let res = await getProductList({
+					res = await getProductList({
 						productCategoryId: this.cateId,
 						sortBy: 'salePrice',
 						sortOrder: 'DESC',
+						status: 1,
 					});
 					goodsList = res.data.elements;
 				}
 			} else {
-				let res = await getProductList({ productCategoryId: this.cateId });
+				res = await getProductList({ productCategoryId: this.cateId, status: 1 });
 				goodsList = res.data.elements;
 			}
 
 			this.goodsList = this.goodsList.concat(goodsList);
 
-			//判断是否还有下一页，有是more  没有是nomore(测试数据判断大于20就没有了)
-			this.loadingType = this.goodsList.length > 20 ? 'nomore' : 'more';
+			//判断是否还有下一页，有是more  没有是nomore
+			this.loadingType = this.goodsList.length >= res.data.paging.total ? 'nomore' : 'more';
 			if (type === 'refresh') {
 				if (loading == 1) {
 					uni.hideLoading();
