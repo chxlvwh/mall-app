@@ -152,7 +152,7 @@
 import { mapState } from 'vuex';
 import { getCoupons, getReceivers } from '@/apis/user';
 import { format } from 'date-fns';
-import { previewOrder } from '@/apis/order';
+import { createOrder, previewOrder } from '@/apis/order';
 
 export default {
 	data() {
@@ -255,8 +255,24 @@ export default {
 			this.payType = type;
 		},
 		placeholder() {
-			uni.redirectTo({
-				url: '/pages/money/pay',
+			const params = {
+				receiverId: this.addressData.id,
+				remark: this.desc,
+				generalCouponId: this.generalCoupon?.id,
+				totalPrice: this.totalPrice,
+				products: this.products.map((item) => ({
+					id: item.id,
+					count: item.count,
+					basePrice: item.preview.basePrice,
+					discount: item.preview.discount,
+					couponId: item.preview.coupon?.id,
+					sku: item.preview.sku,
+				})),
+			};
+			createOrder(params).then(() => {
+				uni.redirectTo({
+					url: '/pages/money/pay',
+				});
 			});
 		},
 		stopPrevent() {},

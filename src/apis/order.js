@@ -7,3 +7,11 @@ export async function previewOrder(data) {
 		data,
 	});
 }
+
+export async function createOrder(data) {
+	return request({
+		method: 'POST',
+		url: '/api/v1/order',
+		data,
+	});
+}
