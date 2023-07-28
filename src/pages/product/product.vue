@@ -46,6 +46,7 @@
 					<text class="selected-text" v-for="(sItem, sIndex) in specSelected" :key="sIndex">
 						{{ sItem.value }}
 					</text>
+					<text>数量：</text><text>{{ count }}{{ detail.unit }}</text>
 				</view>
 				<text class="yticon icon-you"></text>
 			</view>
@@ -171,6 +172,22 @@
 						</text>
 					</view>
 				</view>
+
+				<view class="attr-list">
+					<view>数量</view>
+					<view class="num">
+						<text class="jj minus" @click.stop="count <= 1 ? 1 : count--">-</text>
+						<input
+							class="num-input"
+							v-model="count"
+							:max="detail.stock"
+							data-key="count"
+							type="number"
+							@blur="blurNum"
+						/>
+						<text class="jj plus" @click.stop="count++">+</text>
+					</view>
+				</view>
 				<button class="btn" @click="toggleSpec">完成</button>
 			</view>
 		</view>
@@ -182,9 +199,17 @@
 				<view class="coupon-item" v-for="(item, index) in couponList" :key="index" @click="receiveCoupon(item)">
 					<view class="con">
 						<view class="left">
-							<text class="title">{{ item.name }}</text>
+							<text class="title"
+								>{{ item.name }}
+								<span class="coupon-status" :class="`coupon-status__${item.status}`">{{
+									couponStatusMapping[item.status]
+								}}</span>
+							</text>
 							<text class="time"
-								>有效期至{{ format(new Date(item.endDate), 'yyyy-MM-dd HH:mm:ss') }}</text
+								>开始时间 {{ format(new Date(item.startDate), 'yyyy-MM-dd HH:mm:ss') }}</text
+							>
+							<text class="time"
+								>结束时间 {{ format(new Date(item.endDate), 'yyyy-MM-dd HH:mm:ss') }}</text
 							>
 						</view>
 						<view class="right">
@@ -210,6 +235,7 @@ import { getProductById } from '@/apis/product';
 import { mapState } from 'vuex';
 import { getValidCoupons, receiveCoupon } from '@/apis/user';
 import { format } from 'date-fns';
+import detail from '@/pages/detail/detail.vue';
 
 export default {
 	components: {
@@ -235,6 +261,11 @@ export default {
 			specList: [],
 			couponList: [],
 			couponState: 0,
+			count: 1,
+			couponStatusMapping: {
+				NOT_STARTED: '未开始',
+				ONGOING: '进行中',
+			},
 		};
 	},
 	computed: {
@@ -314,8 +345,10 @@ export default {
 		},
 		//优惠券弹窗开关
 		async toggleCoupon(type) {
-			const { data: coupons } = await getValidCoupons(this.detail.id);
-			this.couponList = coupons;
+			if (type === 'show') {
+				const { data: coupons } = await getValidCoupons(this.detail.id);
+				this.couponList = coupons;
+			}
 			if (!this.couponList || !this.couponList.length) {
 				await uni.showToast({
 					title: '暂无可领优惠券',
@@ -370,6 +403,12 @@ export default {
 				});
 			});
 		},
+		// 数量加减
+		blurNum() {
+			if (this.count < 1) {
+				this.count = 1;
+			}
+		},
 		//分享
 		share() {
 			this.$refs.share.toggleMask();
@@ -382,9 +421,25 @@ export default {
 			if (!this.checkForLogin()) {
 				return;
 			}
-			uni.navigateTo({
-				url: `/pages/order/createOrder?ids=[${this.detail.id}]`,
-			});
+			let selectedSku;
+			if (this.detail.skus) {
+				this.detail.skus.forEach((sku) => {
+					if (
+						sku.props.every((prop) => this.specSelected.some((selected) => selected.value === prop.value))
+					) {
+						selectedSku = sku;
+					}
+				});
+			}
+			if (selectedSku) {
+				uni.navigateTo({
+					url: `/pages/order/createOrder?products=[{"id":${this.detail.id},"count":${this.count},"skuId":${selectedSku.id}}]`,
+				});
+			} else {
+				uni.navigateTo({
+					url: `/pages/order/createOrder?products=[{"id":${this.detail.id},"count":${this.count}}]`,
+				});
+			}
 		},
 		stopPrevent() {},
 		addToCart() {
@@ -425,6 +480,20 @@ page {
 	background: $page-color-base;
 	padding-bottom: 160upx;
 }
+.coupon-status {
+	display: inline-block;
+	padding: 2upx 10upx;
+	color: #fff;
+	border-radius: 10upx;
+	font-size: $font-sm;
+	margin-left: 10upx;
+}
+.coupon-status__NOT_STARTED {
+	background: $uni-color-primary;
+}
+.coupon-status__ONGOING {
+	background: $uni-color-success;
+}
 .icon-you {
 	font-size: $font-base + 2upx;
 	color: #888;
@@ -449,6 +518,35 @@ page {
 			width: 100%;
 			height: 100%;
 		}
+	}
+}
+
+.num {
+	display: flex;
+	align-items: center;
+	margin-top: 10upx;
+	.num-input {
+		width: 80upx;
+		border: 1px solid #ccc;
+		border-radius: 10upx;
+		font-size: 12px;
+		padding: 5upx;
+		box-sizing: content-box;
+	}
+	.jj {
+		width: 40upx;
+		text-align: center;
+		border: 1px solid #ccc;
+		height: 40upx;
+		border-radius: 5upx;
+		box-sizing: border-box;
+		line-height: 30upx;
+	}
+	.minus {
+		margin-right: 30upx;
+	}
+	.plus {
+		margin-left: 30upx;
 	}
 }
 
@@ -495,7 +593,7 @@ page {
 		display: flex;
 		align-items: center;
 		position: relative;
-		height: 120upx;
+		height: 140upx;
 		padding: 0 30upx;
 		&:after {
 			position: absolute;
@@ -514,7 +612,7 @@ page {
 		justify-content: center;
 		flex: 1;
 		overflow: hidden;
-		height: 100upx;
+		height: 120upx;
 	}
 	.title {
 		font-size: 32upx;
@@ -532,7 +630,7 @@ page {
 		align-items: center;
 		font-size: 26upx;
 		color: $font-color-base;
-		height: 100upx;
+		height: 120upx;
 	}
 	.price {
 		font-size: 44upx;

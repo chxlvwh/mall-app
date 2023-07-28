@@ -24,62 +24,74 @@
 
 		<view class="goods-section">
 			<view class="g-header b-b">
-				<image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image>
-				<text class="name">西城小店铺</text>
+				<!--				<image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image>-->
+				<text class="name">商品列表</text>
 			</view>
 			<!-- 商品列表 -->
-			<view class="g-item">
-				<image
-					src="https://ss2.bdstatic.com/70cFvnSh_Q1YnxGkpoWK1HF6hhy/it/u=756705744,3505936868&fm=11&gp=0.jpg"
-				></image>
-				<view class="right">
-					<text class="title clamp">古黛妃 短袖t恤女夏装2019新款</text>
-					<text class="spec">春装款 L</text>
-					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
+			<view v-for="p in products" :key="p.id">
+				<view class="g-item ver-interval">
+					<image v-if="p.preview" :src="p.preview.cover"></image>
+					<view class="right" v-if="p.preview">
+						<text class="title clamp">{{ p.preview.name }}</text>
+						<text class="spec">{{
+							p.preview.sku && p.preview.sku.props.map((it) => it.value).join(' ')
+						}}</text>
+						<view class="price-box">
+							<view>
+								<text class="price">￥{{ p.preview.basePrice / 100 }}</text>
+								<text class="number">x {{ p.count }}</text>
+							</view>
+							<!--							<text v-if="p.preview.coupon" class="coupon"-->
+							<!--								>满{{ p.preview.coupon.threshold }} 减 {{ p.preview.coupon.value }}</text-->
+							<!--							>-->
+							<!--							<text class="final-price">{{-->
+							<!--								(p.preview.basePrice * p.count) / 100 - p.preview.coupon.value-->
+							<!--							}}</text>-->
+						</view>
 					</view>
 				</view>
-			</view>
-			<view class="g-item">
-				<image
-					src="https://ss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=1620020012,789258862&fm=26&gp=0.jpg"
-				></image>
-				<view class="right">
-					<text class="title clamp">韩版于是洞洞拖鞋 夏季浴室防滑简约居家【新人专享，限选意见】</text>
-					<text class="spec">春装款 L</text>
-					<view class="price-box">
-						<text class="price">￥17.8</text>
-						<text class="number">x 1</text>
-					</view>
+				<view class="yt-list-cell b-b" v-if="p.preview.coupon">
+					<view class="cell-icon"> 券 </view>
+					<text class="cell-tit clamp">优惠券</text>
+					<text class="cell-tip disabled"
+						>满{{ p.preview.coupon.threshold }} 减 {{ p.preview.coupon.value }}</text
+					>
+					<text class="cell-tip disabled red ml-60">-￥{{ p.preview.coupon.value }}</text>
+				</view>
+				<view class="yt-list-cell b-b">
+					<text class="cell-tit clamp">商品金额</text>
+					<text class="cell-tip red">{{
+						(p.preview.basePrice * p.count) / 100 - p.preview.coupon.value
+					}}</text>
 				</view>
 			</view>
 		</view>
 
 		<!-- 优惠明细 -->
-		<view class="yt-list">
-			<view class="yt-list-cell b-b" @click="toggleMask('show')">
-				<view class="cell-icon"> 券 </view>
-				<text class="cell-tit clamp">优惠券</text>
-				<text class="cell-tip active"> 选择优惠券 </text>
-				<text class="cell-more wanjia wanjia-gengduo-d"></text>
-			</view>
-			<view class="yt-list-cell b-b">
-				<view class="cell-icon hb"> 减 </view>
-				<text class="cell-tit clamp">商家促销</text>
-				<text class="cell-tip disabled">暂无可用优惠</text>
-			</view>
-		</view>
+		<!--		<view class="yt-list">-->
+		<!--			<view class="yt-list-cell b-b" @click="toggleMask('show')">-->
+		<!--				<view class="cell-icon"> 券 </view>-->
+		<!--				<text class="cell-tit clamp">优惠券</text>-->
+		<!--				<text class="cell-tip active"> 选择优惠券 </text>-->
+		<!--				<text class="cell-more wanjia wanjia-gengduo-d"></text>-->
+		<!--			</view>-->
+		<!--			<view class="yt-list-cell b-b">-->
+		<!--				<view class="cell-icon hb"> 减 </view>-->
+		<!--				<text class="cell-tit clamp">商家促销</text>-->
+		<!--				<text class="cell-tip disabled">暂无可用优惠</text>-->
+		<!--			</view>-->
+		<!--		</view>-->
 		<!-- 金额明细 -->
 		<view class="yt-list">
-			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">商品金额</text>
-				<text class="cell-tip">￥179.88</text>
+			<view class="yt-list-cell b-b" v-if="generalCoupon">
+				<text class="cell-tit clamp">通用券</text>
+				<text class="cell-tip disabled">满{{ generalCoupon.threshold }} 减 {{ generalCoupon.value }}</text>
+				<text class="cell-tip red ml-60">-￥{{ generalCoupon.value }}</text>
 			</view>
-			<view class="yt-list-cell b-b">
-				<text class="cell-tit clamp">优惠金额</text>
-				<text class="cell-tip red">-￥35</text>
-			</view>
+			<!--			<view class="yt-list-cell b-b">-->
+			<!--				<text class="cell-tit clamp">商品金额</text>-->
+			<!--				<text class="cell-tip">￥179.88</text>-->
+			<!--			</view>-->
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip">免运费</text>
@@ -101,9 +113,9 @@
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
-				<text class="price">475</text>
+				<text class="price">{{ totalPrice / 100 }}</text>
 			</view>
-			<text class="submit" @click="submit">提交订单</text>
+			<text class="submit" @click="placeholder">提交订单</text>
 		</view>
 
 		<!-- 优惠券面板 -->
@@ -126,7 +138,7 @@
 						<view class="circle l"></view>
 						<view class="circle r"></view>
 					</view>
-					<text class="tips">限新用户使用</text>
+					<text class="tips">{{ item.scope | scope }}</text>
 				</view>
 			</view>
 		</view>
@@ -137,6 +149,7 @@
 import { mapState } from 'vuex';
 import { getCoupons, getReceivers } from '@/apis/user';
 import { format } from 'date-fns';
+import { previewOrder } from '@/apis/order';
 
 export default {
 	data() {
@@ -151,14 +164,34 @@ export default {
 				},
 			],
 			addressData: {},
+			products: [],
+			generalCoupon: null,
+			totalPrice: 0,
 		};
 	},
 	computed: {
 		...mapState(['userInfo']),
 	},
+	filters: {
+		scope(scope) {
+			switch (scope) {
+				case 'ALL':
+					return '全场通用';
+				case 'CATEGORY':
+					return '指定分类商品可用';
+				case 'PRODUCT':
+					return '指定商品可用';
+				default:
+					return '';
+			}
+		},
+	},
 	onLoad(option) {
 		//商品数据
-		let data = JSON.parse(option.ids);
+		let data = JSON.parse(option.products);
+		console.log('[data:] ', data);
+		this.products = data;
+		this.getPreviewOrder();
 		this.getCouponList();
 	},
 	onShow() {
@@ -169,9 +202,22 @@ export default {
 	},
 	methods: {
 		format,
-		moment() {
-			return moment;
+		// 获取预览订单数据
+		async getPreviewOrder() {
+			const { data } = await previewOrder({
+				products: this.products,
+			});
+			this.products.forEach((item) => {
+				this.$set(
+					item,
+					'preview',
+					data.products.find((p) => p.id === item.id),
+				);
+			});
+			this.generalCoupon = data.generalCoupon;
+			this.totalPrice = data.totalPrice;
 		},
+		// 获取收货地址
 		async getAddress() {
 			const { data: receivers } = await getReceivers(this.userInfo.id);
 			if (receivers.length > 0) {
@@ -205,7 +251,7 @@ export default {
 		changePayType(type) {
 			this.payType = type;
 		},
-		submit() {
+		placeholder() {
 			uni.redirectTo({
 				url: '/pages/money/pay',
 			});
@@ -336,6 +382,7 @@ page {
 			font-size: 32upx;
 			color: $font-color-dark;
 			padding-top: 10upx;
+			justify-content: space-between;
 
 			.price {
 				margin-bottom: 4upx;
@@ -344,6 +391,18 @@ page {
 				font-size: 26upx;
 				color: $font-color-base;
 				margin-left: 20upx;
+			}
+			.coupon {
+				margin-left: 20upx;
+				padding: 2upx 4upx;
+				border: 1px solid $base-color;
+				border-radius: 4upx;
+				color: $base-color;
+				font-size: 26upx;
+			}
+			.final-price {
+				font-size: 36upx;
+				color: $base-color;
 			}
 		}
 
