@@ -34,7 +34,7 @@
 					<view class="right" v-if="p.preview">
 						<text class="title clamp">{{ p.preview.name }}</text>
 						<text class="spec">{{
-							p.preview.sku && p.preview.sku.props.map((it) => it.value).join(' ')
+							p.preview.sku && p.preview.sku.props && p.preview.sku.props.map((it) => it.value).join(' ')
 						}}</text>
 						<view class="price-box">
 							<view>
@@ -50,18 +50,19 @@
 						</view>
 					</view>
 				</view>
-				<view class="yt-list-cell b-b" v-if="p.preview.coupon">
+				<view class="yt-list-cell b-b" v-if="p.preview && p.preview.coupon">
 					<view class="cell-icon"> 券 </view>
 					<text class="cell-tit clamp">优惠券</text>
 					<text class="cell-tip disabled"
-						>满{{ p.preview.coupon.threshold }} 减 {{ p.preview.coupon.value }}</text
+						>满{{ p.preview.coupon.threshold / 100 }} 减 {{ p.preview.coupon.value / 100 }}</text
 					>
-					<text class="cell-tip disabled red ml-60">-￥{{ p.preview.coupon.value }}</text>
+					<text class="cell-tip disabled red ml-60">-￥{{ p.preview.coupon.value / 100 }}</text>
 				</view>
 				<view class="yt-list-cell b-b">
 					<text class="cell-tit clamp">商品金额</text>
 					<text class="cell-tip red">{{
-						(p.preview.basePrice * p.count) / 100 - p.preview.coupon.value
+						(p.preview.basePrice / 100) * p.count -
+						(p.preview && p.preview.coupon ? p.preview.coupon.value / 100 : 0)
 					}}</text>
 				</view>
 			</view>
@@ -85,8 +86,10 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b" v-if="generalCoupon">
 				<text class="cell-tit clamp">通用券</text>
-				<text class="cell-tip disabled">满{{ generalCoupon.threshold }} 减 {{ generalCoupon.value }}</text>
-				<text class="cell-tip red ml-60">-￥{{ generalCoupon.value }}</text>
+				<text class="cell-tip disabled"
+					>满{{ generalCoupon.threshold / 100 }} 减 {{ generalCoupon.value / 100 }}</text
+				>
+				<text class="cell-tip red ml-60">-￥{{ generalCoupon.value / 100 }}</text>
 			</view>
 			<!--			<view class="yt-list-cell b-b">-->
 			<!--				<text class="cell-tit clamp">商品金额</text>-->

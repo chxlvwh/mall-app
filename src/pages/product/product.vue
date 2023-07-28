@@ -213,8 +213,8 @@
 							>
 						</view>
 						<view class="right">
-							<text class="price">{{ item.value }}</text>
-							<text>满{{ item.threshold }}可用</text>
+							<text class="price">{{ item.value / 100 }}</text>
+							<text>满{{ item.threshold / 100 }}可用</text>
 						</view>
 
 						<view class="circle l"></view>
