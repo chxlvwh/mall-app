@@ -21,8 +21,10 @@
 					<!-- 订单列表 -->
 					<view v-for="(item, index) in tabItem.orderList" :key="index" class="order-item">
 						<view class="i-top b-b">
-							<text class="time">{{ item.time }}</text>
-							<text class="state" :style="{ color: item.stateTipColor }">{{ item.stateTip }}</text>
+							<text class="time">{{ format(new Date(item.createdAt), 'yyyy-MM-dd HH:mm:ss') }}</text>
+							<text class="state" :style="{ color: item.stateTipColor }">{{
+								orderStatusMapping[item.status]
+							}}</text>
 							<text
 								v-if="item.status === 'COMPLETED'"
 								class="del-btn yticon icon-iconfontshanchu1"
@@ -48,7 +50,7 @@
 									<div>{{ getSkuValues(goodsItem.sku) }}</div>
 									<span style="white-space: nowrap">x {{ goodsItem.quantity }}</span>
 								</div>
-								<text class="price">{{ goodsItem.discountedPrice / 100 }}</text>
+								<text class="price">{{ goodsItem.basePrice / 100 }}</text>
 							</view>
 						</view>
 
@@ -56,11 +58,7 @@
 							共
 							<text class="num">{{ item.items.length }}</text>
 							件商品 实付款
-							<text class="price">{{
-								item.items.reduce((prev, next) => {
-									return prev + next.discountedPrice * next.quantity;
-								}, 0) / 100
-							}}</text>
+							<text class="price">{{ item.totalPrice / 100 }}</text>
 						</view>
 						<view class="action-box b-t" v-if="item.state != 9">
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
@@ -78,8 +76,9 @@
 <script>
 import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 import empty from '@/components/empty';
-import Json from '@/Json';
 import { getOrderList } from '@/apis/order';
+import { format } from 'date-fns';
+
 export default {
 	components: {
 		uniLoadMore,
@@ -103,23 +102,33 @@ export default {
 				},
 				{
 					state: 2,
-					text: '待收货',
+					text: '待发货',
 					loadingType: 'more',
 					orderList: [],
 				},
 				{
 					state: 3,
-					text: '待评价',
+					text: '待收货',
 					loadingType: 'more',
 					orderList: [],
 				},
 				{
 					state: 4,
-					text: '售后',
+					text: '待评价',
 					loadingType: 'more',
 					orderList: [],
 				},
 			],
+			orderStatusMapping: {
+				UNPAID: '等待买家付款',
+				DELIVERING: '买家已付款',
+				DELIVERED: '卖家已发货',
+				COMMENTING: '交易成功',
+				COMPLETED: '交易成功',
+				CLOSED: '交易关闭',
+				REFUNDING: '退款中',
+				REFUNDED: '已退款',
+			},
 		};
 	},
 
@@ -140,6 +149,7 @@ export default {
 	},
 
 	methods: {
+		format,
 		//获取订单列表
 		loadData(source) {
 			//这里是将订单挂载到tab列表下
@@ -155,19 +165,21 @@ export default {
 				//防止重复加载
 				return;
 			}
-
+			if (navItem.loadingType === 'noMore') {
+				return;
+			}
 			navItem.loadingType = 'loading';
 
 			getOrderList({ status: state }).then((res) => {
 				let orderList = res.data.elements.filter((item) => {
 					//添加不同状态下订单的表现形式
-					item = Object.assign(item, this.orderStateExp(item.state));
+					item = Object.assign(item, this.orderStateExp(item.status));
 					//演示数据所以自己进行状态筛选
 					if (state === 0) {
 						//0为全部订单
 						return item;
 					}
-					return item.state === state;
+					return item.state === this.orderStatusMapping[state];
 				});
 				orderList.forEach((item) => {
 					navItem.orderList.push(item);
@@ -177,6 +189,11 @@ export default {
 
 				//判断是否还有数据， 有改为 more， 没有改为noMore
 				navItem.loadingType = 'more';
+				if (res.data.paging.total < navItem.orderList.length) {
+					navItem.loadingType = 'more';
+				} else {
+					navItem.loadingType = 'noMore';
+				}
 			});
 
 			// setTimeout(() => {

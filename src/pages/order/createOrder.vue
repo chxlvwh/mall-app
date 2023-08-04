@@ -38,7 +38,7 @@
 						}}</text>
 						<view class="price-box">
 							<view>
-								<text class="price">￥{{ p.preview.pricePerUnit / 100 }}</text>
+								<text class="price">￥{{ p.preview.basePrice / 100 }}</text>
 								<text class="number">x {{ p.count }}</text>
 							</view>
 							<!--							<text v-if="p.preview.coupon" class="coupon"-->
@@ -60,7 +60,7 @@
 				</view>
 				<view class="yt-list-cell b-b">
 					<text class="cell-tit clamp">商品金额</text>
-					<text class="cell-tip red">{{ p.preview.basePrice / 100 }}</text>
+					<text class="cell-tip red">{{ p.preview.discountedTotalPrice / 100 }}</text>
 				</view>
 			</view>
 		</view>
@@ -260,6 +260,8 @@ export default {
 				products: this.products.map((item) => ({
 					id: item.id,
 					count: item.count,
+					totalPrice: item.preview.totalPrice,
+					discountedTotalPrice: item.preview.discountedTotalPrice,
 					basePrice: item.preview.basePrice,
 					discount: item.preview.discount,
 					couponId: item.preview.coupon?.id,
