@@ -10,16 +10,16 @@
 					<text class="username">{{ userInfo.profile.nickname || '游客' }}</text>
 				</view>
 			</view>
-			<view class="vip-card-box">
-				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>
-				<view class="b-btn"> 立即开通 </view>
-				<view class="tit">
-					<text class="yticon icon-iLinkapp-"></text>
-					DCloud会员
-				</view>
-				<text class="e-m">DCloud Union</text>
-				<text class="e-b">开通会员开发无bug 一测就上线</text>
-			</view>
+			<!--			<view class="vip-card-box">-->
+			<!--				<image class="card-bg" src="/static/vip-card-bg.png" mode=""></image>-->
+			<!--				<view class="b-btn"> 立即开通 </view>-->
+			<!--				<view class="tit">-->
+			<!--					<text class="yticon icon-iLinkapp-"></text>-->
+			<!--					DCloud会员-->
+			<!--				</view>-->
+			<!--				<text class="e-m">DCloud Union</text>-->
+			<!--				<text class="e-b">开通会员开发无bug 一测就上线</text>-->
+			<!--			</view>-->
 		</view>
 
 		<view
@@ -36,20 +36,20 @@
 		>
 			<image class="arc" src="/static/arc.png"></image>
 
-			<view class="tj-sction">
-				<view class="tj-item">
-					<text class="num">128.8</text>
-					<text>余额</text>
-				</view>
-				<view class="tj-item">
-					<text class="num">0</text>
-					<text>优惠券</text>
-				</view>
-				<view class="tj-item">
-					<text class="num">20</text>
-					<text>积分</text>
-				</view>
-			</view>
+			<!--			<view class="tj-sction">-->
+			<!--				<view class="tj-item">-->
+			<!--					<text class="num">128.8</text>-->
+			<!--					<text>余额</text>-->
+			<!--				</view>-->
+			<!--				<view class="tj-item">-->
+			<!--					<text class="num">0</text>-->
+			<!--					<text>优惠券</text>-->
+			<!--				</view>-->
+			<!--				<view class="tj-item">-->
+			<!--					<text class="num">20</text>-->
+			<!--					<text>积分</text>-->
+			<!--				</view>-->
+			<!--			</view>-->
 			<!-- 订单 -->
 			<view class="order-section">
 				<view
