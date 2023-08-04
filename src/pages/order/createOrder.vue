@@ -38,7 +38,7 @@
 						}}</text>
 						<view class="price-box">
 							<view>
-								<text class="price">￥{{ p.preview.basePrice / 100 }}</text>
+								<text class="price">￥{{ p.preview.pricePerUnit / 100 }}</text>
 								<text class="number">x {{ p.count }}</text>
 							</view>
 							<!--							<text v-if="p.preview.coupon" class="coupon"-->
@@ -60,10 +60,7 @@
 				</view>
 				<view class="yt-list-cell b-b">
 					<text class="cell-tit clamp">商品金额</text>
-					<text class="cell-tip red">{{
-						(p.preview.basePrice / 100) * p.count -
-						(p.preview && p.preview.coupon ? p.preview.coupon.value / 100 : 0)
-					}}</text>
+					<text class="cell-tip red">{{ p.preview.basePrice / 100 }}</text>
 				</view>
 			</view>
 		</view>
