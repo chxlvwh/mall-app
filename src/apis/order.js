@@ -23,3 +23,12 @@ export async function getOrderDetail(orderId) {
 		url: `/api/v1/public/order/${orderId}`,
 	});
 }
+
+// 获取订单列表
+export async function getOrderList(params) {
+	return request({
+		method: 'GET',
+		url: '/api/v1/public/order',
+		params,
+	});
+}
