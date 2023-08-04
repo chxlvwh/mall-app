@@ -2,7 +2,7 @@
 	<view class="app">
 		<view class="price-box">
 			<text>支付金额</text>
-			<text class="price">38.88</text>
+			<text class="price">{{ (orderInfo.totalPrice || 0) / 100 }}</text>
 		</view>
 
 		<view class="pay-type-list">
@@ -40,28 +40,39 @@
 				</label>
 			</view>
 		</view>
-		
+
 		<text class="mix-btn" @click="confirm">确认支付</text>
 	</view>
 </template>
 
 <script>
 
+	import { getOrderDetail } from '@/apis/order';
+
 	export default {
 		data() {
 			return {
 				payType: 1,
+				orderNo: '',
 				orderInfo: {}
 			};
 		},
 		computed: {
-		
+
 		},
 		onLoad(options) {
-			
+			this.orderNo = options.orderNo
+			this.getOrderDetail()
 		},
 
 		methods: {
+			// 获取订单详情
+			getOrderDetail() {
+				getOrderDetail(this.orderNo).then(res => {
+					console.log('[res:] ', res);
+					this.orderInfo = res.data
+				})
+			},
 			//选择支付方式
 			changePayType(type) {
 				this.payType = type;
@@ -106,7 +117,7 @@
 		margin-top: 20upx;
 		background-color: #fff;
 		padding-left: 60upx;
-		
+
 		.type-item{
 			height: 120upx;
 			padding: 20upx 0;
@@ -117,7 +128,7 @@
 			font-size: 30upx;
 			position:relative;
 		}
-		
+
 		.icon{
 			width: 100upx;
 			font-size: 52upx;

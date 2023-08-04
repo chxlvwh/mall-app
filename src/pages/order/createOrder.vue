@@ -269,9 +269,9 @@ export default {
 					sku: item.preview.sku,
 				})),
 			};
-			createOrder(params).then(() => {
+			createOrder(params).then((res) => {
 				uni.redirectTo({
-					url: '/pages/money/pay',
+					url: `/pages/money/pay?orderNo=${res.data}`,
 				});
 			});
 		},
