@@ -67,7 +67,7 @@ http.interceptors.response.use(
 			// });
 		} else {
 			uni.showToast({
-				title: error.data.error?.message,
+				title: error.data.error || error.data.error.message,
 				duration: 1500,
 				icon: 'error',
 			});
