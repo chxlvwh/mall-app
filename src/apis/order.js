@@ -40,3 +40,11 @@ export async function cancelOrder(orderId) {
 		url: `/api/v1/public/order/${orderId}/cancel`,
 	});
 }
+
+/** 删除订单 */
+export async function deleteOrder(orderId) {
+	return request({
+		method: 'DELETE',
+		url: `/api/v1/public/order/${orderId}`,
+	});
+}

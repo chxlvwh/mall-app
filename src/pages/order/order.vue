@@ -25,11 +25,6 @@
 							<text class="state" :style="{ color: item.stateTipColor }">{{
 								orderStatusMapping[item.status]
 							}}</text>
-							<text
-								v-if="item.status === 'COMPLETED'"
-								class="del-btn yticon icon-iconfontshanchu1"
-								@click="deleteOrder(index)"
-							></text>
 						</view>
 						<scroll-view v-if="item.items.length > 1" class="goods-box" scroll-x>
 							<view v-for="(goodsItem, goodsIndex) in item.items" :key="goodsIndex" class="goods-item">
@@ -64,8 +59,11 @@
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 							<button class="action-btn recom">立即支付</button>
 						</view>
-						<view class="action-box b-t" v-if="item.status === 'CLOSED'">
-							<button class="action-btn" @click="removeOrder(item)">删除订单</button>
+						<view
+							class="action-box b-t"
+							v-if="item.status === 'CLOSED' || item.status === 'COMPLETED' || item.status === 'REFUNDED'"
+						>
+							<button class="action-btn" @click="deleteOrder(item)">删除订单</button>
 						</view>
 					</view>
 
@@ -79,7 +77,7 @@
 <script>
 import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 import empty from '@/components/empty';
-import { cancelOrder, getOrderList } from '@/apis/order';
+import { cancelOrder, deleteOrder, getOrderList } from '@/apis/order';
 import { format } from 'date-fns';
 
 export default {
@@ -223,14 +221,29 @@ export default {
 			this.tabCurrentIndex = index;
 		},
 		//删除订单
-		deleteOrder(index) {
-			uni.showLoading({
-				title: '请稍后',
+		deleteOrder(item, index) {
+			uni.showModal({
+				title: '提示',
+				content: '删除后可以联系客服恢复？',
+				success: (res) => {
+					if (res.confirm) {
+						uni.showLoading({
+							title: '请稍后',
+						});
+						deleteOrder(item.orderNo)
+							.then(() => {
+								uni.showToast({
+									title: '已删除',
+									icon: 'none',
+								});
+								this.navList[this.tabCurrentIndex].orderList.splice(index, 1);
+							})
+							.finally(() => {
+								uni.hideLoading();
+							});
+					}
+				},
 			});
-			setTimeout(() => {
-				this.navList[this.tabCurrentIndex].orderList.splice(index, 1);
-				uni.hideLoading();
-			}, 600);
 		},
 		//取消订单
 		cancelOrder(item) {
