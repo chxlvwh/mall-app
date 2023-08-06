@@ -60,9 +60,12 @@
 							件商品 实付款
 							<text class="price">{{ item.totalPrice / 100 }}</text>
 						</view>
-						<view class="action-box b-t" v-if="item.state != 9">
+						<view class="action-box b-t" v-if="item.status === 'UNPAID'">
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 							<button class="action-btn recom">立即支付</button>
+						</view>
+						<view class="action-box b-t" v-if="item.status === 'CLOSED'">
+							<button class="action-btn" @click="removeOrder(item)">删除订单</button>
 						</view>
 					</view>
 
@@ -76,7 +79,7 @@
 <script>
 import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 import empty from '@/components/empty';
-import { getOrderList } from '@/apis/order';
+import { cancelOrder, getOrderList } from '@/apis/order';
 import { format } from 'date-fns';
 
 export default {
@@ -174,12 +177,18 @@ export default {
 				let orderList = res.data.elements.filter((item) => {
 					//添加不同状态下订单的表现形式
 					item = Object.assign(item, this.orderStateExp(item.status));
-					//演示数据所以自己进行状态筛选
-					if (state === 0) {
-						//0为全部订单
-						return item;
+					switch (state) {
+						case 0:
+							return item;
+						case 1:
+							return item.status === 'UNPAID';
+						case 2:
+							return item.status === 'DELIVERING';
+						case 3:
+							return item.status === 'DELIVERED';
+						case 4:
+							return item.status === 'COMMENTING';
 					}
-					return item.state === this.orderStatusMapping[state];
 				});
 				orderList.forEach((item) => {
 					navItem.orderList.push(item);
@@ -195,27 +204,6 @@ export default {
 					navItem.loadingType = 'noMore';
 				}
 			});
-
-			// setTimeout(() => {
-			// 	let orderList = Json.orderList.filter((item) => {
-			// 		//添加不同状态下订单的表现形式
-			// 		item = Object.assign(item, this.orderStateExp(item.state));
-			// 		//演示数据所以自己进行状态筛选
-			// 		if (state === 0) {
-			// 			//0为全部订单
-			// 			return item;
-			// 		}
-			// 		return item.state === state;
-			// 	});
-			// 	orderList.forEach((item) => {
-			// 		navItem.orderList.push(item);
-			// 	});
-			// 	//loaded新字段用于表示数据加载完毕，如果为空可以显示空白页
-			// 	this.$set(navItem, 'loaded', true);
-			//
-			// 	//判断是否还有数据， 有改为 more， 没有改为noMore
-			// 	navItem.loadingType = 'more';
-			// }, 600);
 		},
 
 		getSkuValues(sku) {
@@ -246,24 +234,39 @@ export default {
 		},
 		//取消订单
 		cancelOrder(item) {
-			uni.showLoading({
-				title: '请稍后',
+			uni.showModal({
+				title: '提示',
+				content: '取消后无法恢复，优惠券可退回，有效期内使用，确定要取消吗？',
+				success: (res) => {
+					if (res.confirm) {
+						uni.showLoading({
+							title: '请稍后',
+						});
+						cancelOrder(item.orderNo)
+							.then(() => {
+								uni.showToast({
+									title: '已取消',
+									icon: 'none',
+								});
+								let { stateTip, stateTipColor } = this.orderStateExp(9);
+								item = Object.assign(item, {
+									state: 9,
+									stateTip,
+									stateTipColor,
+									status: 'CLOSED',
+								});
+
+								//取消订单后删除待付款中该项
+								let list = this.navList[1].orderList;
+								let index = list.findIndex((val) => val.id === item.id);
+								index !== -1 && list.splice(index, 1);
+							})
+							.finally(() => {
+								uni.hideLoading();
+							});
+					}
+				},
 			});
-			setTimeout(() => {
-				let { stateTip, stateTipColor } = this.orderStateExp(9);
-				item = Object.assign(item, {
-					state: 9,
-					stateTip,
-					stateTipColor,
-				});
-
-				//取消订单后删除待付款中该项
-				let list = this.navList[1].orderList;
-				let index = list.findIndex((val) => val.id === item.id);
-				index !== -1 && list.splice(index, 1);
-
-				uni.hideLoading();
-			}, 600);
 		},
 
 		//订单状态文字和颜色

@@ -32,3 +32,11 @@ export async function getOrderList(params) {
 		params,
 	});
 }
+
+/** 取消订单 */
+export async function cancelOrder(orderId) {
+	return request({
+		method: 'PUT',
+		url: `/api/v1/public/order/${orderId}/cancel`,
+	});
+}
