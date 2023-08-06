@@ -215,6 +215,7 @@ export default {
 				);
 			});
 			this.generalCoupon = data.generalCoupon;
+			this.generalCouponItem = data.generalCouponItem;
 			this.totalPrice = data.totalPrice;
 		},
 		// 获取收货地址
@@ -256,6 +257,7 @@ export default {
 				receiverId: this.addressData.id,
 				remark: this.desc,
 				generalCouponId: this.generalCoupon?.id,
+				generalCouponItemId: this.generalCouponItem?.id,
 				totalPrice: this.totalPrice,
 				products: this.products.map((item) => ({
 					id: item.id,
@@ -265,6 +267,7 @@ export default {
 					basePrice: item.preview.basePrice,
 					discount: item.preview.discount,
 					couponId: item.preview.coupon?.id,
+					couponItemId: item.preview.couponItem?.id,
 					sku: item.preview.sku,
 				})),
 			};
