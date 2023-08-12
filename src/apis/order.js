@@ -50,9 +50,10 @@ export async function deleteOrder(orderId) {
 }
 
 /** 支付订单 */
-export async function payOrder(orderId) {
+export async function payOrder(orderId, data) {
 	return request({
 		method: 'PUT',
 		url: `/api/v1/public/order/${orderId}/pay`,
+		data,
 	});
 }

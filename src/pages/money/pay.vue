@@ -62,7 +62,7 @@ export default {
 		},
 		//确认支付
 		confirm: async function () {
-			await payOrder(this.orderNo);
+			await payOrder(this.orderNo, { payType: this.payType });
 			await uni.redirectTo({
 				url: '/pages/money/paySuccess',
 			});
