@@ -14,9 +14,13 @@
 			<text class="title">{{ detail.name }}</text>
 			<view class="price-box">
 				<text class="price-tip">¥</text>
-				<text class="price">{{ getSelectedSku().price / 100 }}</text>
+				<text class="price" v-if="getSelectedSku()">{{ getSelectedSku().price / 100 }}</text>
+				<text class="price" v-else>{{ detail.salePrice / 100 }}</text>
 				<text class="m-price">¥{{ detail.originPrice / 100 }}</text>
-				<text class="coupon-tip">{{ ((getSelectedSku().price / detail.originPrice) * 10).toFixed(1) }}折</text>
+				<text class="coupon-tip" v-if="getSelectedSku()"
+					>{{ ((getSelectedSku().price / detail.originPrice) * 10).toFixed(1) }}折</text
+				>
+				<text class="coupon-tip" v-else>{{ ((detail.salePrice / detail.originPrice) * 10).toFixed(1) }}折</text>
 			</view>
 			<view class="bot-row">
 				<text>销量: {{ detail.sales || 0 }}</text>

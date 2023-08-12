@@ -60,7 +60,7 @@
 				</view>
 				<view class="yt-list-cell b-b">
 					<text class="cell-tit clamp">商品金额</text>
-					<text class="cell-tip red">{{ p.preview.discountedTotalPrice / 100 }}</text>
+					<text class="cell-tip red" v-if="p.preview">{{ p.preview.discountedTotalPrice / 100 }}</text>
 				</view>
 			</view>
 		</view>
