@@ -57,3 +57,20 @@ export async function payOrder(orderId, data) {
 		data,
 	});
 }
+
+/** 确认收货 */
+export async function confirmOrder(orderId) {
+	return request({
+		method: 'PUT',
+		url: `/api/v1/public/order/${orderId}/confirm`,
+	});
+}
+
+/** 评价 */
+export async function commentOrder(orderId, data) {
+	return request({
+		method: 'PUT',
+		url: `/api/v1/public/order/${orderId}/comment`,
+		data,
+	});
+}

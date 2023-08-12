@@ -59,6 +59,14 @@
 							<button class="action-btn" @click="cancelOrder(item)">取消订单</button>
 							<button class="action-btn recom">立即支付</button>
 						</view>
+						<view class="action-box b-t" v-if="item.status === 'DELIVERED'">
+							<button class="action-btn" @click="getLogisticInfo(item)">查看物流</button>
+							<button class="action-btn recom" @click="confirmOrder(item)">确认收货</button>
+						</view>
+						<view class="action-box b-t" v-if="item.status === 'COMMENTING'">
+							<button class="action-btn" @click="getLogisticInfo(item)">查看物流</button>
+							<button class="action-btn recom" @click="comment(item)">评价</button>
+						</view>
 						<view
 							class="action-box b-t"
 							v-if="item.status === 'CLOSED' || item.status === 'COMPLETED' || item.status === 'REFUNDED'"
@@ -77,8 +85,9 @@
 <script>
 import uniLoadMore from '@/components/uni-load-more/uni-load-more.vue';
 import empty from '@/components/empty';
-import { cancelOrder, deleteOrder, getOrderList } from '@/apis/order';
+import { cancelOrder, commentOrder, confirmOrder, deleteOrder, getOrderList } from '@/apis/order';
 import { format } from 'date-fns';
+import { Model } from 'vue-property-decorator';
 
 export default {
 	components: {
@@ -171,7 +180,7 @@ export default {
 			}
 			navItem.loadingType = 'loading';
 
-			getOrderList({ status: state }).then((res) => {
+			getOrderList({ status: state, withLogistic: true }).then((res) => {
 				let orderList = res.data.elements.filter((item) => {
 					//添加不同状态下订单的表现形式
 					item = Object.assign(item, this.orderStateExp(item.status));
@@ -301,6 +310,54 @@ export default {
 				//更多自定义
 			}
 			return { stateTip, stateTipColor };
+		},
+		getLogisticInfo(item) {
+			console.log('[item:] ', item);
+		},
+		async confirmOrder(item) {
+			uni.showModal({
+				title: '提示',
+				content: '确认收货后，订单将完成，确定要确认收货吗？',
+				success: async (res) => {
+					if (res.confirm) {
+						await uni.showLoading({
+							title: '请稍后',
+						});
+						await confirmOrder(item.orderNo);
+						await uni.showToast({
+							title: '已确认收货',
+							icon: 'success',
+						});
+						item.status = 'COMMENTING';
+						uni.hideLoading();
+					}
+				},
+			});
+		},
+		async comment(item) {
+			uni.showModal({
+				title: '请输入评价内容',
+				editable: true,
+				success: async (res) => {
+					if (res.confirm) {
+						await uni.showLoading({
+							title: '请稍后',
+						});
+						await commentOrder(item.orderNo, {
+							products: item.items.map((it) => ({
+								id: it.product.id,
+								content: res.content,
+							})),
+						});
+						await uni.showToast({
+							title: '已确认收货',
+							icon: 'success',
+						});
+						item.status = 'COMMENTING';
+						uni.hideLoading();
+					}
+				},
+			});
 		},
 	},
 };
