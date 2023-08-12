@@ -48,3 +48,11 @@ export async function deleteOrder(orderId) {
 		url: `/api/v1/public/order/${orderId}`,
 	});
 }
+
+/** 支付订单 */
+export async function payOrder(orderId) {
+	return request({
+		method: 'PUT',
+		url: `/api/v1/public/order/${orderId}/pay`,
+	});
+}
