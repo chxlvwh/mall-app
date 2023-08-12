@@ -133,7 +133,7 @@ export default {
 				UNPAID: '等待买家付款',
 				DELIVERING: '买家已付款',
 				DELIVERED: '卖家已发货',
-				COMMENTING: '交易成功',
+				COMMENTING: '等待买家评价',
 				COMPLETED: '交易成功',
 				CLOSED: '交易关闭',
 				REFUNDING: '退款中',
@@ -233,7 +233,7 @@ export default {
 		deleteOrder(item, index) {
 			uni.showModal({
 				title: '提示',
-				content: '删除后可以联系客服恢复？',
+				content: '订单删除后不可恢复，确定删除吗？',
 				success: (res) => {
 					if (res.confirm) {
 						uni.showLoading({
@@ -353,7 +353,7 @@ export default {
 							title: '已确认收货',
 							icon: 'success',
 						});
-						item.status = 'COMMENTING';
+						item.status = 'COMPETED';
 						uni.hideLoading();
 					}
 				},
