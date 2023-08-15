@@ -426,6 +426,23 @@ export default {
 			if (!this.checkForLogin()) {
 				return;
 			}
+			if (this.getSelectedSku()) {
+				if (this.getSelectedSku().stock < this.count) {
+					uni.showToast({
+						title: '库存不足',
+						icon: 'none',
+					});
+					return;
+				}
+			} else {
+				if (this.detail.stock < this.count) {
+					uni.showToast({
+						title: '库存不足',
+						icon: 'none',
+					});
+					return;
+				}
+			}
 			let selectedSku;
 			if (this.detail.skus) {
 				this.detail.skus.forEach((sku) => {
